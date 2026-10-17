@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ساحة الألعاب</title>
+<meta name="description" content="مجموعة ألعاب صغيرة وممتعة تلعبها في متصفحك، منها إكس أو وحجر ورقة مقص ضد الذكاء الاصطناعي، وألغاز بـ150 مستوى.">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+Bhaijaan+2:wght@600;700&family=Cairo:wght@400;600&display=swap">
+<style>
+:root{--bg:#1B1A2E;--surface:#262541;--ink:#F1EEFB;--muted:#A7A3C9;--line:#3A3860;--accent:#FFB703;--accent2:#FF5D8F;--good:#36C98F;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:dark}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Cairo,Tahoma,sans-serif}
+.wrap{max-width:760px;margin:0 auto;padding:22px 16px 50px}
+h1{font-family:"Baloo Bhaijaan 2",Cairo,sans-serif;font-size:clamp(28px,6vw,40px);margin:4px 0 4px}
+.lead{color:var(--muted);margin:0 0 20px}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;text-align:center;cursor:pointer;font:inherit;color:inherit}
+.card:hover{border-color:var(--accent)}
+.card .emj{font-size:32px;display:block;margin-bottom:6px}
+.card .nm{font-family:"Baloo Bhaijaan 2";font-weight:600;font-size:15px}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+#game{display:none}
+#game.show{display:block}
+.topbar{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+.back{background:var(--surface);border:1px solid var(--line);color:var(--ink);border-radius:9px;padding:8px 14px;cursor:pointer;font:inherit}
+.gtitle{font-family:"Baloo Bhaijaan 2";font-size:20px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px;min-height:260px}
+.btn{background:var(--accent);color:#2A1D00;border:0;border-radius:9px;padding:10px 18px;font-weight:700;cursor:pointer;font-family:inherit}
+.btn.alt{background:var(--accent2);color:#2A0012}
+.status{margin:12px 0;color:var(--muted);font-size:14px;min-height:20px}
+.center{text-align:center}
+.score{font-weight:700;color:var(--accent)}
+/* tictactoe */
+.ttt{display:grid;grid-template-columns:repeat(3,72px);gap:6px;margin:0 auto;justify-content:center}
+.ttt button{width:72px;height:72px;font-size:30px;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--ink);cursor:pointer}
+/* memory */
+.mem{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;max-width:340px;margin:0 auto}
+.mem button{aspect-ratio:1;font-size:26px;background:var(--bg);border:1px solid var(--line);border-radius:10px;cursor:pointer}
+.mem button.open,.mem button.done{background:var(--accent);color:#2A1D00}
+/* whack */
+.whack{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:300px;margin:0 auto}
+.whack button{aspect-ratio:1;border-radius:50%;background:var(--bg);border:1px solid var(--line);font-size:26px;cursor:pointer}
+.whack button.up{background:var(--accent2)}
+/* reaction */
+.reactbox{height:200px;border-radius:14px;display:grid;place-items:center;font-size:18px;cursor:pointer;background:var(--bg);border:1px solid var(--line)}
+.reactbox.go{background:var(--good)}
+/* riddles */
+.opt{background:var(--surface);color:var(--ink);border:1px solid var(--line)}
+footer{margin-top:30px;color:var(--muted);font-size:13px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div id="hub">
+    <h1>ساحة الألعاب</h1>
+    <p class="lead">٨ ألعاب صغيرة وسريعة، منها لعب ضد الذكاء الاصطناعي ومستويات تصعب تدريجيًا.</p>
+    <div class="cards">
+      <button class="card" data-g="ttt"><span class="emj">⭕</span><span class="nm">إكس أو ضد AI</span></button>
+      <button class="card" data-g="rps"><span class="emj">✊</span><span class="nm">حجر ورقة مقص</span></button>
+      <button class="card" data-g="mem"><span class="emj">🧠</span><span class="nm">لعبة الذاكرة</span></button>
+      <button class="card" data-g="num"><span class="emj">🔢</span><span class="nm">خمّن الرقم</span></button>
+      <button class="card" data-g="react"><span class="emj">⚡</span><span class="nm">اختبار سرعة الرد</span></button>
+      <button class="card" data-g="whack"><span class="emj">🔨</span><span class="nm">اضرب الخلد</span></button>
+      <button class="card" data-g="math"><span class="emj">➗</span><span class="nm">تحدي الرياضيات</span></button>
+      <button class="card" data-g="riddles"><span class="emj">🧩</span><span class="nm">ألغاز (150 مستوى)</span></button>
+    </div>
+    <footer>© ساحة الألعاب. تعمل بالكامل داخل متصفحك.</footer>
+  </div>
+
+  <div id="game">
+    <div class="topbar"><button class="back" id="back">← رجوع</button><div class="gtitle" id="gtitle"></div></div>
+    <div class="panel" id="panel"></div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var hub=document.getElementById('hub'), game=document.getElementById('game'),
+      panel=document.getElementById('panel'), gtitle=document.getElementById('gtitle');
+  var cleanup=null;
+
+  function open(name,title){
+    if(cleanup){cleanup();cleanup=null}
+    hub.style.display='none';game.classList.add('show');gtitle.textContent=title;
+    panel.innerHTML='';
+    cleanup=GAMES[name](panel)||null;
+  }
+  document.getElementById('back').onclick=function(){
+    if(cleanup){cleanup();cleanup=null}
+    game.classList.remove('show');hub.style.display='block';
+  };
+  document.querySelectorAll('.card').forEach(function(c){
+    c.onclick=function(){open(c.dataset.g,c.querySelector('.nm').textContent)};
+  });
+
+  function finalScreen(root,title,detail,onAgain){
+    root.innerHTML='<div class="center"><div class="gtitle" style="margin-bottom:10px">'+title+'</div><div class="status">'+detail+'</div><button class="btn" id="again">العب مرة أخرى</button></div>';
+    root.querySelector('#again').onclick=onAgain;
+  }
+
+  var GAMES={};
+
+  // ---- Tic Tac Toe: 3 difficulty levels, match of 3 rounds, final score ----
+  GAMES.ttt=function(root){
+    var diffs=[['easy','سهل'],['medium','متوسط'],['hard','صعب (لا يُقهر)']];
+    var results={w:0,l:0,d:0}, round=0, diff='easy', board, over, bd, st;
+    var lines=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+    function winner(b){for(var i=0;i<lines.length;i++){var l=lines[i];if(b[l[0]]&&b[l[0]]===b[l[1]]&&b[l[1]]===b[l[2]])return b[l[0]]}return b.every(function(c){return c})?'draw':null}
+    function minimax(b,isAI){
+      var w=winner(b);if(w==='O')return{s:1};if(w==='X')return{s:-1};if(w==='draw')return{s:0};
+      var best=null;
+      for(var i=0;i<9;i++){if(b[i])continue;b[i]=isAI?'O':'X';var r=minimax(b,!isAI);b[i]='';var val=r.s;
+        if(best===null||(isAI&&val>best.s)||(!isAI&&val<best.s))best={s:val,i:i}}
+      return best;
+    }
+    function aiMove(){
+      var empties=board.map(function(v,i){return v?null:i}).filter(function(v){return v!==null});
+      if(diff==='easy')return empties[Math.floor(Math.random()*empties.length)];
+      if(diff==='medium'&&Math.random()<0.4)return empties[Math.floor(Math.random()*empties.length)];
+      return minimax(board,true).i;
+    }
+    function pickDiff(){
+      root.innerHTML='<div class="status">اختر المستوى:</div><div class="center" style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">'+
+        diffs.map(function(d){return '<button class="btn" data-d="'+d[0]+'">'+d[1]+'</button>'}).join('')+'</div>';
+      root.querySelectorAll('[data-d]').forEach(function(b){b.onclick=function(){diff=b.dataset.d;results={w:0,l:0,d:0};round=0;nextRound()}});
+    }
+    function nextRound(){
+      round++;board=Array(9).fill('');over=false;
+      root.innerHTML='<div class="status" id="st">الجولة '+round+' من 3 — دورك (X)</div><div class="ttt" id="bd"></div>';
+      bd=root.querySelector('#bd');st=root.querySelector('#st');
+      render();
+    }
+    function render(){
+      bd.innerHTML='';
+      board.forEach(function(v,i){
+        var b=document.createElement('button');b.textContent=v;b.disabled=!!v||over;
+        b.onclick=function(){
+          board[i]='X';paint();
+          var w=winner(board);if(w){finishRound(w);return}
+          st.textContent='دور الذكاء الاصطناعي...';
+          setTimeout(function(){
+            var mv=aiMove();if(mv!==undefined)board[mv]='O';paint();
+            var w2=winner(board);if(w2)finishRound(w2);else st.textContent='الجولة '+round+' من 3 — دورك (X)';
+          },300);
+        };
+        bd.appendChild(b);
+      });
+    }
+    function paint(){Array.prototype.forEach.call(bd.children,function(btn,i){btn.textContent=board[i];btn.disabled=!!board[i]||over})}
+    function finishRound(w){
+      over=true;paint();
+      if(w==='draw')results.d++;else if(w==='X')results.w++;else results.l++;
+      st.textContent=(w==='draw'?'تعادل!':w==='X'?'فزت بالجولة! 🎉':'خسرت الجولة');
+      setTimeout(function(){round<3?nextRound():showFinal()},900);
+    }
+    function showFinal(){finalScreen(root,'النتيجة النهائية','فزت '+results.w+' — خسرت '+results.l+' — تعادل '+results.d,pickDiff)}
+    pickDiff();
+  };
+
+  // ---- Rock Paper Scissors: smarter AI by difficulty, match of 7, final score ----
+  GAMES.rps=function(root){
+    var M={rock:'✊',paper:'✋',scissors:'✌️'};
+    var beats={rock:'scissors',paper:'rock',scissors:'paper'};
+    var diff='easy', score={me:0,ai:0}, round=0, hist=[];
+    function pickDiff(){
+      root.innerHTML='<div class="status">اختر صعوبة الذكاء الاصطناعي:</div><div class="center" style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">'+
+        '<button class="btn" data-d="easy">سهل</button><button class="btn" data-d="medium">متوسط</button><button class="btn" data-d="hard">صعب</button></div>';
+      root.querySelectorAll('[data-d]').forEach(function(b){b.onclick=function(){diff=b.dataset.d;score={me:0,ai:0};round=0;hist=[];playUI()}});
+    }
+    function aiChoice(){
+      var keys=Object.keys(M);
+      if(diff==='easy'||hist.length<2)return keys[Math.floor(Math.random()*3)];
+      var last=hist[hist.length-1];
+      if(diff==='medium')return Math.random()<0.5?beats[last]:keys[Math.floor(Math.random()*3)];
+      var count={rock:0,paper:0,scissors:0};hist.forEach(function(h){count[h]++});
+      var common=Object.keys(count).sort(function(a,b){return count[b]-count[a]})[0];
+      return beats[common];
+    }
+    function playUI(){
+      root.innerHTML='<div class="status center score" id="sc">أنت '+score.me+' - '+score.ai+' AI — جولة '+(round+1)+'/7</div>'+
+        '<div class="status" id="st">اختر:</div><div class="center" style="display:flex;gap:10px;justify-content:center">'+
+        Object.keys(M).map(function(k){return '<button class="btn" data-k="'+k+'" style="font-size:26px">'+M[k]+'</button>'}).join('')+'</div>';
+      root.querySelectorAll('[data-k]').forEach(function(b){
+        b.onclick=function(){
+          var me=b.dataset.k, ai=aiChoice();hist.push(me);round++;
+          var res= me===ai?'draw':beats[me]===ai?'win':'lose';
+          if(res==='win')score.me++;if(res==='lose')score.ai++;
+          root.querySelector('#st').textContent='أنت: '+M[me]+'  AI: '+M[ai]+'  →  '+(res==='win'?'فزت! 🎉':res==='lose'?'خسرت':'تعادل');
+          if(round>=7)setTimeout(showFinal,900);else setTimeout(playUI,900);
+        };
+      });
+    }
+    function showFinal(){
+      finalScreen(root,'النتيجة النهائية','أنت '+score.me+' — AI '+score.ai+(score.me>score.ai?' — فزت بالمباراة! 🏆':score.me<score.ai?' — خسرت المباراة':' — تعادل'),pickDiff);
+    }
+    pickDiff();
+  };
+
+  // ---- Memory: 3 levels, more cards each time, final score ----
+  GAMES.mem=function(root){
+    var emoSets=[['🍎','🍌','🍇','🍉'],['🍎','🍌','🍇','🍉','🍓','🥝'],['🍎','🍌','🍇','🍉','🍓','🥝','🍒','🍍']];
+    var level=0, totalMoves=0;
+    function startLevel(){
+      var emo=emoSets[level], deck=emo.concat(emo).sort(function(){return Math.random()-.5});
+      var open1=null,open2=null,lock=false,moves=0,found=0;
+      root.innerHTML='<div class="status" id="st">مستوى '+(level+1)+' من 3 — اقلب بطاقتين متطابقتين</div><div class="mem" id="bd"></div>';
+      var bd=root.querySelector('#bd'), st=root.querySelector('#st');
+      bd.style.gridTemplateColumns='repeat('+(level===2?4:4)+',1fr)';
+      deck.forEach(function(e){
+        var b=document.createElement('button');
+        b.onclick=function(){
+          if(lock||b.classList.contains('open')||b.classList.contains('done'))return;
+          b.textContent=e;b.classList.add('open');
+          if(!open1){open1=b}else{
+            open2=b;moves++;lock=true;
+            if(open1.textContent===open2.textContent){
+              open1.classList.add('done');open2.classList.add('done');found++;open1=null;open2=null;lock=false;
+              if(found===emo.length){totalMoves+=moves;level<2?setTimeout(function(){level++;startLevel()},700):setTimeout(showFinal,700)}
+              else st.textContent='مستوى '+(level+1)+' — محاولات: '+moves;
+            }else{
+              setTimeout(function(){open1.textContent='';open1.classList.remove('open');open2.textContent='';open2.classList.remove('open');open1=null;open2=null;lock=false},700);
+            }
+          }
+        };
+        bd.appendChild(b);
+      });
+    }
+    function showFinal(){finalScreen(root,'النتيجة النهائية','أنهيت 3 مستويات بإجمالي '+totalMoves+' محاولة 🎉',function(){level=0;totalMoves=0;startLevel()})}
+    startLevel();
+  };
+
+  // ---- Number guess: 3 levels, bigger range + fewer tries each time, final score ----
+  GAMES.num=function(root){
+    var levels=[{max:50,tries:7},{max:100,tries:6},{max:150,tries:5}];
+    var level=0, passed=0;
+    function startLevel(){
+      var L=levels[level], target=1+Math.floor(Math.random()*L.max), tries=0;
+      root.innerHTML='<div class="status">مستوى '+(level+1)+'/3 — خمّن رقمًا بين 1 و'+L.max+' (لديك '+L.tries+' محاولات)</div>'+
+        '<div class="center"><input type="number" id="g" min="1" max="'+L.max+'" style="font-size:18px;padding:8px;width:120px;text-align:center;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--ink)"> <button class="btn" id="go">تحقق</button></div><div class="status" id="st"></div>';
+      var inp=root.querySelector('#g'), st=root.querySelector('#st');
+      root.querySelector('#go').onclick=function(){
+        var v=parseInt(inp.value,10);if(!v)return;tries++;
+        if(v===target){passed++;st.textContent='🎉 صح! خلال '+tries+' محاولة';setTimeout(function(){level<2?(level++,startLevel()):showFinal()},900)}
+        else if(tries>=L.tries){st.textContent='انتهت محاولاتك! الرقم كان '+target;setTimeout(showFinal,1200)}
+        else st.textContent=(v<target?'أكبر ⬆️':'أصغر ⬇️')+' — محاولة '+tries+'/'+L.tries;
+      };
+    }
+    function showFinal(){finalScreen(root,'النتيجة النهائية','اجتزت '+passed+' من 3 مستويات',function(){level=0;passed=0;startLevel()})}
+    startLevel();
+  };
+
+  // ---- Reaction test: 5 attempts, average + final score ----
+  GAMES.react=function(root){
+    var attempts=[], n=0, timer=null;
+    function round(){
+      var state='idle';
+      root.innerHTML='<div class="status center">المحاولة '+(n+1)+'/5</div><div class="reactbox" id="bx">اضغط للبدء</div>';
+      var bx=root.querySelector('#bx'), t0;
+      bx.onclick=function(){
+        if(state==='idle'){state='wait';bx.textContent='انتظر اللون الأخضر...';
+          timer=setTimeout(function(){state='go';t0=Date.now();bx.classList.add('go');bx.textContent='اضغط الآن!'},800+Math.random()*2000);
+        }else if(state==='wait'){clearTimeout(timer);bx.textContent='بدري! اضغط للمحاولة من جديد';state='idle'}
+        else if(state==='go'){
+          var ms=Date.now()-t0;attempts.push(ms);n++;
+          if(n<5)setTimeout(round,600);else setTimeout(showFinal,600);
+        }
+      };
+    }
+    function showFinal(){
+      var avg=Math.round(attempts.reduce(function(a,b){return a+b},0)/attempts.length);
+      var rate=avg<250?'ممتاز ⚡':avg<400?'جيد 👍':'عادي';
+      finalScreen(root,'النتيجة النهائية','متوسط سرعتك: '+avg+' ملي ثانية — '+rate,function(){attempts=[];n=0;round()});
+    }
+    round();
+    return function(){clearTimeout(timer)};
+  };
+
+  // ---- Whack a mole: 3 levels, faster each time, cumulative final score ----
+  GAMES.whack=function(root){
+    var levels=[{time:20,speed:850},{time:18,speed:650},{time:16,speed:450}];
+    var level=0, total=0, gi=null, ti=null;
+    function startLevel(){
+      var L=levels[level], score=0, time=L.time, moleIdx=-1, cells=[];
+      root.innerHTML='<div class="status">مستوى '+(level+1)+'/3 — الوقت: <span id="tm">'+time+'</span>ث — النقاط: <span class="score" id="sc">0</span></div><div class="whack" id="bd"></div>';
+      var bd=root.querySelector('#bd'), sc=root.querySelector('#sc'), tm=root.querySelector('#tm');
+      for(var i=0;i<9;i++){
+        var b=document.createElement('button');
+        (function(idx,btn){btn.onclick=function(){if(idx===moleIdx){score++;sc.textContent=score;btn.classList.remove('up');moleIdx=-1}}})(i,b);
+        bd.appendChild(b);cells.push(b);
+      }
+      function pop(){cells.forEach(function(c){c.classList.remove('up')});moleIdx=Math.floor(Math.random()*9);cells[moleIdx].classList.add('up')}
+      gi=setInterval(pop,L.speed);
+      ti=setInterval(function(){
+        time--;tm.textContent=time;
+        if(time<=0){
+          clearInterval(gi);clearInterval(ti);total+=score;
+          level<2?setTimeout(function(){level++;startLevel()},600):setTimeout(showFinal,600);
+        }
+      },1000);
+    }
+    function showFinal(){finalScreen(root,'النتيجة النهائية','مجموع نقاطك عبر 3 مستويات: '+total+' 🏆',function(){level=0;total=0;startLevel()})}
+    startLevel();
+    return function(){clearInterval(gi);clearInterval(ti)};
+  };
+
+  // ---- Quick math: difficulty rises with streak, final score ----
+  GAMES.math=function(root){
+    var score=0,timer=null,time=40,cur=null,level=1,streak=0;
+    function build(){
+      root.innerHTML='<div class="status">المستوى: <span id="lv">1</span> — الوقت: <span id="tm">40</span>ث — النقاط: <span class="score" id="sc">0</span></div>'+
+        '<div class="center" style="font-size:28px;margin:16px 0" id="q"></div>'+
+        '<div class="center"><input type="number" id="a" style="font-size:18px;padding:8px;width:120px;text-align:center;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--ink)"> <button class="btn" id="go">تحقق</button></div><div class="status" id="st"></div>';
+      var q=root.querySelector('#q'), a=root.querySelector('#a'), sc=root.querySelector('#sc'), lv=root.querySelector('#lv'), st=root.querySelector('#st');
+      function next(){
+        var range=10+level*10, ops=level<2?['+','-']:['+','-','×'];
+        var x=1+Math.floor(Math.random()*range), y=1+Math.floor(Math.random()*range), op=ops[Math.floor(Math.random()*ops.length)];
+        cur= op==='+'?x+y:op==='-'?x-y:x*y;
+        q.textContent=x+' '+op+' '+y+' = ؟';a.value='';a.focus();
+      }
+      root.querySelector('#go').onclick=function(){
+        if(cur===null)return;
+        if(parseInt(a.value,10)===cur){score++;sc.textContent=score;streak++;if(streak%5===0){level++;lv.textContent=level}st.textContent='صح! 👍'}
+        else st.textContent='خطأ، الجواب '+cur;
+        next();
+      };
+      timer=setInterval(function(){
+        time--;root.querySelector('#tm').textContent=time;
+        if(time<=0){clearInterval(timer);cur=null;root.querySelector('#go').disabled=true;
+          finalScreen(root,'النتيجة النهائية','نقاطك: '+score+' — وصلت للمستوى '+level,function(){score=0;time=40;cur=null;level=1;streak=0;build()});
+        }
+      },1000);
+      next();
+    }
+    build();
+    return function(){clearInterval(timer)};
+  };
+
+  // ---- Riddles: 150 levels, 15s per question, AI voice read-aloud, final score ----
+  GAMES.riddles=function(root){
+    var bank=[
+      {q:'شيء له أسنان ولا يعض، ما هو؟',o:['المشط','الثعبان','المنشار','القط'],c:0},
+ {q:'كم عدد حروف اللغة العربية؟',o:['26','27','28','29'],c:2},
+      {q:'ما هو أطول نهر في العالم؟',o:['الأمازون','النيل','الفرات','دجلة'],c:1},
+      {q:'ما ناتج 12 × 12؟',o:['124','144','134','154'],c:1},
+      {q:'أي غاز يتنفسه الإنسان للبقاء على قيد الحياة؟',o:['ثاني أكسيد الكربون','النيتروجين','الأكسجين','الهيدروجين'],c:2},
+      {q:'ما هو أسرع حيوان بري؟',o:['الأسد','الفهد','الحصان','النمر'],c:1},
+      {q:'كم عدد أضلاع المثلث؟',o:['2','3','4','5'],c:1},
+      {q:'ما هي عاصمة اليابان؟',o:['بكين','سول','طوكيو','بانكوك'],c:2},
+      {q:'ما ناتج طرح 50 من 100؟',o:['40','45','50','60'],c:2},
+      {q:'ما اسم القمر الطبيعي للأرض؟',o:['المريخ','القمر','بلوتو','تيتان'],c:1},
+      {q:'كم عدد أرجل العنكبوت؟',o:['6','8','10','4'],c:1},
+      {q:'ما هي أكبر دولة من حيث المساحة؟',o:['الصين','كندا','روسيا','أمريكا'],c:2},
+      {q:'ما ناتج 100 ÷ 4؟',o:['20','25','30','40'],c:1}
+    ];
+    var order=[], level=0, correct=0, timer=null, timeLeft=15;
+    function shuffleCycle(){
+      var idx=bank.map(function(_,i){return i});
+      for(var i=idx.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=idx[i];idx[i]=idx[j];idx[j]=t}
+      order=order.concat(idx);
+    }
+    function getQuestion(i){while(i>=order.length)shuffleCycle();return bank[order[i]]}
+    function speak(text,setMsg){
+      if(!('speechSynthesis' in window)){setMsg('القراءة الصوتية غير مدعومة في هذا المتصفح.');return}
+      window.speechSynthesis.cancel();
+      var u=new SpeechSynthesisUtterance(text);
+      var voices=window.speechSynthesis.getVoices();
+      var ar=voices.filter(function(v){return /ar/i.test(v.lang)});
+      if(ar.length)u.voice=ar[0];
+      u.lang=ar.length?ar[0].lang:'ar-SA';
+      u.rate=0.9;u.pitch=1;
+      u.onerror=function(){setMsg('تعذر تشغيل الصوت في هذا العرض. جرّب بعد نشر الصفحة على استضافتك وفتحها بمتصفح عادي.')};
+      setMsg('');
+      try{window.speechSynthesis.speak(u)}catch(e){setMsg('تعذر تشغيل الصوت على هذا الجهاز.');return}
+      setTimeout(function(){if(!window.speechSynthesis.speaking)setMsg('القراءة الصوتية غير متاحة في هذه المعاينة. جرّب بعد نشر الصفحة على استضافتك وفتحها بمتصفح عادي.')},400);
+    }
+    function startLevel(){
+      if(level>=150){showFinal();return}
+      var r=getQuestion(level);timeLeft=15;
+      root.innerHTML='<div class="status">مستوى <span>'+(level+1)+'</span> من 150 — صحيح: '+correct+'</div>'+
+        '<progress id="pg" value="15" max="15" style="width:100%;height:8px;accent-color:var(--accent);border-radius:6px;margin:8px 0"></progress>'+
+        '<div class="center" style="font-size:19px;margin:14px 0;display:flex;align-items:center;gap:8px;justify-content:center;flex-wrap:wrap"><span>'+r.q+'</span>'+
+        '<button class="btn alt" id="sp" style="font-size:15px;padding:6px 10px" aria-label="استمع للسؤال">🔊</button></div>'+
+        '<div class="status center" id="vmsg" style="font-size:12px;min-height:16px"></div>'+
+        '<div class="center" style="display:grid;gap:8px;max-width:320px;margin:0 auto" id="opts"></div>'+
+        '<div class="status center" id="fb"></div>';
+      var opts=root.querySelector('#opts'), pg=root.querySelector('#pg'), vmsg=root.querySelector('#vmsg'), fb=root.querySelector('#fb');
+      var answered=false;
+      r.o.forEach(function(opt,oi){
+        var b=document.createElement('button');b.className='btn opt';b.textContent=opt;
+        b.onclick=function(){finish(oi===r.c,oi)};
+        opts.appendChild(b);
+      });
+      root.querySelector('#sp').onclick=function(){speak(r.q,function(m){vmsg.textContent=m})};
+      clearInterval(timer);
+      timer=setInterval(function(){
+        timeLeft--;if(pg)pg.value=timeLeft;
+        if(timeLeft<=0){clearInterval(timer);finish(false,-1)}
+      },1000);
+      function finish(ok,picked){
+        if(answered)return;answered=true;
+        clearInterval(timer);
+        Array.prototype.forEach.call(opts.children,function(btn,i){
+          btn.disabled=true;
+          if(i===r.c)btn.style.background='var(--good)';
+          else if(i===picked)btn.style.background='#C0392B';
+        });
+        if(ok){correct++;fb.textContent='صحيح! 🎉'}
+        else fb.textContent= picked===-1?'⏱️ انتهى الوقت — السؤال احتُسب خطأ':'إجابة خاطئة';
+        level++;
+        setTimeout(startLevel,700);
+      }
+    }
+    function showFinal(){finalScreen(root,'النتيجة النهائية','أجبت صح على '+correct+' من 150 سؤالًا 🧩',function(){level=0;correct=0;order=[];startLevel()})}
+    startLevel();
+    return function(){clearInterval(timer);if('speechSynthesis' in window)window.speechSynthesis.cancel()};
+  };
+})();
+</script>
+</body>
+</html>
+
+     
