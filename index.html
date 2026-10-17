@@ -341,7 +341,7 @@ footer{margin-top:30px;color:var(--muted);font-size:13px}
   GAMES.riddles=function(root){
     var bank=[
       {q:'شيء له أسنان ولا يعض، ما هو؟',o:['المشط','الثعبان','المنشار','القط'],c:0},
- {q:'كم عدد حروف اللغة العربية؟',o:['26','27','28','29'],c:2},
+{q:'كم عدد حروف اللغة العربية؟',o:['26','27','28','29'],c:2},
       {q:'ما هو أطول نهر في العالم؟',o:['الأمازون','النيل','الفرات','دجلة'],c:1},
       {q:'ما ناتج 12 × 12؟',o:['124','144','134','154'],c:1},
       {q:'أي غاز يتنفسه الإنسان للبقاء على قيد الحياة؟',o:['ثاني أكسيد الكربون','النيتروجين','الأكسجين','الهيدروجين'],c:2},
@@ -361,48 +361,25 @@ footer{margin-top:30px;color:var(--muted);font-size:13px}
       order=order.concat(idx);
     }
     function getQuestion(i){while(i>=order.length)shuffleCycle();return bank[order[i]]}
+    var speakBusy=false;
     function speak(text,setMsg){
       if(!('speechSynthesis' in window)){setMsg('القراءة الصوتية غير مدعومة في هذا المتصفح.');return}
-      function speak(text, setMsg) {
-  if(!('speechSynthesis' in window)){
-    setMsg("القراءة الصوتية غير مدعومة في هذا المتصفح.");
-    return;
-  }
-  window.speechSynthesis.cancel();
-  
-  function doSpeak() {
-    var u = new SpeechSynthesisUtterance(text);
-    var voices = window.speechSynthesis.getVoices();
-    var arVoice = voices.find(function(v){ return /ar/i.test(v.lang) || /arabic/i.test(v.name); });
-    if(arVoice) {
-      u.voice = arVoice;
-      u.lang = arVoice.lang;
-    } else {
-      u.lang = 'ar-SA';
-    }
-    u.rate = 0.9;
-    u.pitch = 1;
-    u.onerror = function(){ setMsg("تعذر تشغيل الصوت."); };
-    setMsg("");
-    try {
-      window.speechSynthesis.speak(u);
-    } catch(e) {
-      setMsg("تعذر تشغيل الصوت على هذا الجهاز.");
-    }
-  }
-
-  var voices = window.speechSynthesis.getVoices();
-  if(voices.length > 0){
-    doSpeak();
-  } else {
-    window.speechSynthesis.onvoiceschanged = function(){
-      doSpeak();
-      window.speechSynthesis.onvoiceschanged = null;
-    };
-    setTimeout(function(){ doSpeak(); }, 200);
-  }
-}
-
+      if(speakBusy)return;
+      speakBusy=true;
+      window.speechSynthesis.cancel();
+      setTimeout(function(){
+        var u=new SpeechSynthesisUtterance(text);
+        var voices=window.speechSynthesis.getVoices();
+        var ar=voices.filter(function(v){return /ar/i.test(v.lang)});
+        if(ar.length)u.voice=ar[0];
+        u.lang=ar.length?ar[0].lang:'ar-SA';
+        u.rate=0.85;u.pitch=1;
+        u.onerror=function(){speakBusy=false;setMsg('تعذر تشغيل الصوت في هذا العرض. جرّب بعد نشر الصفحة على استضافتك وفتحها بمتصفح عادي.')};
+        u.onend=function(){speakBusy=false};
+        setMsg('');
+        try{window.speechSynthesis.speak(u)}catch(e){speakBusy=false;setMsg('تعذر تشغيل الصوت على هذا الجهاز.');return}
+      },150);
+      setTimeout(function(){if(!window.speechSynthesis.speaking)setMsg('القراءة الصوتية غير متاحة في هذه المعاينة. جرّب بعد نشر الصفحة على استضافتك وفتحها بمتصفح عادي.')},650);
     }
     function startLevel(){
       if(level>=150){showFinal();return}
@@ -450,4 +427,4 @@ footer{margin-top:30px;color:var(--muted);font-size:13px}
 </body>
 </html>
 
-     
+    
